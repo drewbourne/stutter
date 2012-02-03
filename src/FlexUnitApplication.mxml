@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- This is an auto generated file and is not intended for modification. -->
+
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml"
+				xmlns:flexui="flexunit.flexui.*"
+				minWidth="955" minHeight="600" creationComplete="onCreationComplete()"
+				layout="absolute">
+	<mx:Script>
+		<![CDATA[
+			import stutter.StutterRunTimeTest;
+			
+			public function currentRunTestSuite():Array
+			{
+				var testsToRun:Array = new Array();
+				testsToRun.push(stutter.StutterRunTimeTest);
+				return testsToRun;
+			}
+			
+			
+			private function onCreationComplete():void
+			{
+				testRunner.runWithFlexUnit4Runner(currentRunTestSuite(), "stutter");
+			}
+			
+		]]>
+	</mx:Script>
+	<flexui:FlexUnitTestRunnerUI id="testRunner">
+	</flexui:FlexUnitTestRunnerUI>
+	
+</mx:Application>

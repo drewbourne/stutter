@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="stutter.StutterRunTimeTest"/>
+    <classEntry path="stutter.StutterRunTime"/>
+    <classEntry path="stutter.S"/>
+    <classEntry path="stutter.Symbol"/>
+    <classEntry path="stutter.Symbols"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
