@@ -11,7 +11,7 @@
          import org.flexunit.listeners.CIListener;
          import org.flexunit.runner.FlexUnitCore;
 
-         import stutter.StutterRunTimeTest;
+         import stutter.*;
 
          private var core:FlexUnitCore;
 
@@ -20,7 +20,7 @@
             core = new FlexUnitCore();
             core.addListener(new TraceListener());
             core.addListener(new CIListener());
-            core.run(StutterRunTimeTest);
+            core.run(StutterRunTimeTest, StutterReaderTest, StutterTest);
          }
       ]]>
     </mx:Script>
