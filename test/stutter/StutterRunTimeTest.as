@@ -102,10 +102,10 @@ package stutter
 		[Test]
 		public function lambda():void
 		{
-			// (label second `(lambda (x) (car (cdr x))))
+			// (label second '(lambda (x) (car (cdr x))))
 			l.eval([ S('label'), S('second'), [ S('quote'), [ S('lambda'), [ S('x') ], [ S('car'), [ S('cdr'), S('x')]]]]]);
 
-			// (second `(1 2 3))
+			// (second '(1 2 3))
 			assertThat(l.eval([ S('second'), [ S('quote'), [ 1, 2, 3 ]]]), equalTo(2));
 		}
 	}
