@@ -13,9 +13,15 @@ package stutter
 	{
 		public var reader:StutterReader;
 
+		[Before]
+		public function setup():void 
+		{
+			reader = new StutterReader();
+		}
+
 		public function read(string:String):Object
 		{
-			return (new StutterReader(string)).parse();
+			return reader.read(string);
 		}
 
 		[Test]

@@ -10,11 +10,13 @@ package stutter
 	public class StutterTest
 	{
 		private var runtime:StutterRunTime;
+		private var reader:StutterReader;
 
 		[Before]
 		public function setup():void 
 		{
 			runtime = new StutterRunTime();
+			reader = new StutterReader();
 		}
 
 		[Test]
@@ -27,7 +29,7 @@ package stutter
 
 		private function eval(expression:String):*
 		{
-			return runtime.eval((new StutterReader(expression)).parse());
+			return runtime.eval(reader.read(expression));
 		}
 	}
 }

@@ -4,9 +4,16 @@ package stutter
 	{
 		private var _tokens:Array;
 
-		public function StutterReader(expression:String)
+		public function StutterReader()
+		{
+			super();
+		}
+
+		public function read(expression:String):Object 
 		{
 			_tokens = expression.match(/[()]|\w+|".*?"|'.*?'/g);
+
+			return parse();
 		}
 
 		public function peek():String 

@@ -20,7 +20,11 @@
             core = new FlexUnitCore();
             core.addListener(new TraceListener());
             core.addListener(new CIListener());
-            core.run(StutterRunTimeTest, StutterReaderTest, StutterTest);
+            core.run(
+                StutterRunTimeTest, 
+                StutterReaderTest, 
+                StutterTest
+                );
          }
       ]]>
     </mx:Script>
