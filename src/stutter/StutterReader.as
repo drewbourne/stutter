@@ -11,7 +11,10 @@ package stutter
 
 		public function read(expression:String):Object 
 		{
-			_tokens = expression.match(/[()]|\w+|".*?"|'.*?'/g);
+			
+			_tokens = expression.match(
+			//	parentheses	numbers			atoms	strings			operators	flags
+				/[()]| 		\d+(\.\d+)?|	\w+(-\w+)*|	".*?"|'.*?'|	[\+\-\*\/\<\>]	/gx);
 
 			return parse();
 		}
@@ -29,7 +32,7 @@ package stutter
 		public function parse():Object 
 		{
 			var token:String = nextToken();
-			trace('parse', token);
+
 			if (token === '(')
 			{
 				return parseList();
@@ -38,9 +41,9 @@ package stutter
 			{
 				return token.slice(1, -1);
 			}
-			else if ((/\d+/).test(token)) 
+			else if ((/\d+(\.\d+)?/).test(token)) 
 			{
-				return parseInt(token);
+				return parseFloat(token);
 			}
 			else
 			{
@@ -51,11 +54,15 @@ package stutter
 		public function parseList():Array 
 		{
 			var list:Array = [];
-			while (peek() !== ')')
+			var token:String;
+
+			while ((token = peek()) && token != null && token !== ')')
 			{
 				list.push(parse());
 			}
+
 			nextToken();
+
 			return list;	
 		}
 	}
