@@ -34,7 +34,7 @@ package stutter
 
 			// (eq 42 a)
 			// => true
-			assertThat(l.eval([ S('eq'), 42, S('a')]), isTrue());
+			assertThat(l.eval([ S('eq'), 42, S('a')]), equalTo(TRUE));
 		}
 		
 		[Test]
@@ -84,19 +84,19 @@ package stutter
 
 			// (atom a)
 			// => true
-			assertThat(l.eval([ S('atom'), [ S('a') ]]), isTrue());
+			assertThat(l.eval([ S('atom'), [ S('a') ]]), equalTo(TRUE));
 
 			// (atom 123)
 			// => true
-			assertThat(l.eval([ S('atom'), [ 123 ]]), isTrue());
+			assertThat(l.eval([ S('atom'), [ 123 ]]), equalTo(TRUE));
 
 			// (atom `(1))
 			// => true
-			assertThat(l.eval([ S('atom'), [ S('quote'), [ 1 ] ]]), isFalse());
+			assertThat(l.eval([ S('atom'), [ S('quote'), [ 1 ] ]]), equalTo(FALSE));
 
 			// (atom `(1 2))
 			// => false
-			assertThat(l.eval([ S('atom'), [ S('quote'), [ 1, 2 ]]]), isFalse());
+			assertThat(l.eval([ S('atom'), [ S('quote'), [ 1, 2 ]]]), equalTo(FALSE));
 		}
 		
 		[Test]
@@ -107,6 +107,23 @@ package stutter
 
 			// (second '(1 2 3))
 			assertThat(l.eval([ S('second'), [ S('quote'), [ 1, 2, 3 ]]]), equalTo(2));
+		}
+
+		[Test]
+		public function math():void 
+		{
+			assertThat('+', l.eval([ S('+'), 2, 3 ]), equalTo(5));
+			assertThat('-', l.eval([ S('-'), 2, 3 ]), equalTo(-1));
+			assertThat('*', l.eval([ S('*'), 2, 3 ]), equalTo(6));
+			assertThat('/', l.eval([ S('/'), 6, 2 ]), equalTo(3));
+			assertThat('<', l.eval([ S('<'), 2, 2 ]), equalTo(FALSE));
+			assertThat('<', l.eval([ S('<'), 2, 3 ]), equalTo(TRUE));
+			assertThat('<', l.eval([ S('<'), 3, 2 ]), equalTo(FALSE));
+			assertThat('>', l.eval([ S('>'), 2, 2 ]), equalTo(FALSE));
+			assertThat('>', l.eval([ S('>'), 2, 3 ]), equalTo(FALSE));
+			assertThat('>', l.eval([ S('>'), 3, 2 ]), equalTo(TRUE));
+			assertThat('=', l.eval([ S('='), 2, 2 ]), equalTo(TRUE));
+			assertThat('=', l.eval([ S('='), 2, 3 ]), equalTo(FALSE));
 		}
 	}
 }
