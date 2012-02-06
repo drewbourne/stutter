@@ -13,13 +13,20 @@ package stutter
 	public class StutterRunTime
 	{
 		private var _env:Dictionary;
+		private var _specialForms:Dictionary;
 		
 		public function StutterRunTime()
 		{
 			super();
 			
+			_specialForms = new Dictionary(); 
+			_specialForms[ S('quote') ] = true;
+			_specialForms[ S('if') ] 	= true;
+			_specialForms[ S('and') ] 	= true;
+			_specialForms[ S('or') ] 	= true;
+
 			_env = new Dictionary();
-			
+
 			_env[S('label')] = function _label(args:Array, _:*):*
 			{
 				var name:Symbol = args[0];
@@ -58,7 +65,7 @@ package stutter
 				return l === r ? TRUE : FALSE;
 			};
 			
-			_env[S('if')] = _env[S('cond')] = function _cond(args:Array, ctx:*):*
+			_env[S('if')] = function _cond(args:Array, ctx:*):*
 			{
 				var cond:* = args[0];
 				var then:* = args[1]; 
@@ -72,7 +79,47 @@ package stutter
 				return (sexp is Symbol || sexp is Number) ? TRUE : FALSE;
 			};
 
-			// operators
+			// logical
+			_env[S('and')] = function _and(args:*, ctx:*):* 
+			{
+				var result:* = FALSE;
+
+				for each (var sexp:* in args) 
+				{
+					result = eval(sexp, ctx);
+
+					if (result === FALSE) 
+					{
+						return FALSE;
+					}
+				}
+
+				return result;
+			}
+
+			_env[S('or')] = function _or(args:*, ctx:*):*
+			{
+				var result:* = FALSE;
+
+				for each (var sexp:* in args)
+				{
+					result = eval(sexp, ctx);
+
+					if (result !== FALSE) 
+					{
+						break;
+					}
+				}
+
+				return result;
+			}
+
+			_env[S('not')] = function _not(args:*, ctx:*):*
+			{
+				return args[0] === FALSE ? TRUE : FALSE;
+			}
+
+			// math operators
 			_env[S('+')] = function _plus(args:*, _:*):Number 
 			{
 				return inject(args.shift(), args, add) as Number;
@@ -80,6 +127,10 @@ package stutter
 
 			_env[S('-')] = function _minus(args:*, _:*):Number 
 			{
+				if (args.length == 1) {
+					return -args[0];
+				}
+
 				return inject(args.shift(), args, sub) as Number;	
 			}
 
@@ -114,16 +165,18 @@ package stutter
 		{
 			ctx ||= _env;
 
-			trace('eval', toString(sexp));
-			// trace('eval \tctx', ctx == _env ? 'env' : toString(ctx));
-			// trace('eval \tatom', _env[S('atom')].call(null, [sexp], ctx));
+			trace('eval', toString(sexp), ctx == _env ? 'env' : toString(ctx));
 			
 			if (_env[S('atom')].call(null, [sexp], ctx) === TRUE)
 			{
-				if (ctx[sexp])
+				if (ctx[sexp] !== undefined)
 				{
+					// trace('eval    ->atom ctx[sexp]', '\n\t<-result', toString(ctx[sexp]));
+
 					return ctx[sexp];
 				}
+
+				// trace('eval    ->atom sexp', '\n\t<-result', toString(sexp));
 
 				return sexp;
 			}
@@ -132,12 +185,13 @@ package stutter
 			var args:Array = sexp.slice(1);
 
 			args = map(args, function(a:*):* {
-				return ([ S('quote'), S('if')].indexOf(fn) == -1) ? eval(a, ctx) : a;
+				return (!_specialForms[fn]) ? eval(a, ctx) : a;
 			});
 
 			var result:* = apply(fn, args, ctx);
 
-			trace('eval    ->fn', fn, '\targs', toString(args), '\n\t<-result', result);
+			// trace('eval    ->fn', fn, '\targs', toString(args), '\n\t<-result', result);
+			// trace('eval <-', toString(sexp))
 
 			return result;
 		}
@@ -146,9 +200,7 @@ package stutter
 		{
 			ctx ||= _env;
 
-			trace('apply fn', fn);
-			trace('apply args', toString(args));
-			// trace('apply \tctx', ctx == _env ? 'env' : toString(ctx));
+			trace('apply', toString(fn), toString(args), ctx == _env ? 'env' : toString(ctx));
 
 			if (fn is Number)
 			{
@@ -204,7 +256,7 @@ package stutter
 			
 			var result:* = eval(target[2], evalctx);
 
-			trace('apply   ->fn', fn, '\targs', toString(args), '\n\t<-result', result);
+			// trace('apply   ->fn', fn, '\targs', toString(args), '\n\t<-result', result);
 
 			return result;
 		}
@@ -260,14 +312,14 @@ internal function toString(object:Object):String
 
 	if (object is Dictionary)
 	{
-		out = '{';
+		out = '{\n\t';
 		var pairs:Array = [];
 		for (var key:* in object)
 		{
 			pairs.push(key + ': ' + toString(object[key]));
 		}
 
-		out += pairs.join(', ');
+		out += pairs.join(',\n\t');
 		out += '}';
 		return out;	
 	}

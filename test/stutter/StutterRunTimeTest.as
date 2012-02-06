@@ -114,6 +114,7 @@ package stutter
 		{
 			assertThat('+', l.eval([ S('+'), 2, 3 ]), equalTo(5));
 			assertThat('-', l.eval([ S('-'), 2, 3 ]), equalTo(-1));
+			assertThat('-', l.eval([ S('-'), 2 ]), equalTo(-2));
 			assertThat('*', l.eval([ S('*'), 2, 3 ]), equalTo(6));
 			assertThat('/', l.eval([ S('/'), 6, 2 ]), equalTo(3));
 			assertThat('<', l.eval([ S('<'), 2, 2 ]), equalTo(FALSE));
