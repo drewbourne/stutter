@@ -13,8 +13,8 @@ package stutter
 		{
 			
 			_tokens = expression.match(
-			//	parentheses	numbers			atoms	strings			operators	flags
-				/[()]| 		\d+(\.\d+)?|	\w+(-\w+)*|	".*?"|'.*?'|	[\+\-\*\/\<\>]	/gx);
+			//	parentheses		numbers				atoms			strings			operators		flags
+				/[()]| 			-?\d+(\.\d+)?|	\w+(-\w+)*|		".*?"|'.*?'|	[\+\-\*\/\<\>]	/gx);
 
 			return parse();
 		}

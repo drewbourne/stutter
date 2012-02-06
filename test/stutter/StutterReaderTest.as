@@ -31,6 +31,7 @@ package stutter
 				['()', emptyArray()],
 				['1', equalTo(1)],
 				['1.234567890', equalTo(1.234567890)],
+				['(-1 -2.2 -0.33)', equalTo([-1, -2.2, -0.33])],
 				["'single quoted'", equalTo('single quoted')],
 				['"double quoted"', equalTo('double quoted')],
 				['(1 2 3)', array(1, 2, 3)],
