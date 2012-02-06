@@ -23,7 +23,8 @@
             core.run(
                 StutterRunTimeTest, 
                 StutterReaderTest, 
-                StutterTest
+                StutterTest, 
+                SICPTest
                 );
          }
       ]]>
