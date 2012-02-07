@@ -76,7 +76,7 @@ package stutter
 			// => 43
 			assertThat(l.eval([ S('if'), [ S('eq'), 1, 2 ], 42, 43 ]), equalTo(43));
 		}
-		
+	
 		[Test]
 		public function atom():void
 		{

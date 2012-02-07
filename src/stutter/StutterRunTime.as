@@ -22,6 +22,7 @@ package stutter
 			_specialForms = new Dictionary(); 
 			_specialForms[ S('quote') ] = true;
 			_specialForms[ S('if') ] 	= true;
+			_specialForms[ S('cond') ] 	= true;
 			_specialForms[ S('and') ] 	= true;
 			_specialForms[ S('or') ] 	= true;
 
@@ -65,13 +66,46 @@ package stutter
 				return l === r ? TRUE : FALSE;
 			};
 			
-			_env[S('if')] = function _cond(args:Array, ctx:*):*
+			_env[S('if')] = function _if(args:Array, ctx:*):*
 			{
 				var cond:* = args[0];
 				var then:* = args[1]; 
 				var els:* = args[2];
 				return eval(cond, ctx) === TRUE ? eval(then, ctx) : eval(els, ctx);
 			};
+
+			_env[S('cond')] = function _cond(args:Array, ctx:*):*
+			{
+				// (cond (when-expr then-body) 
+				// 		 ... 
+				// 		 (when-expr then-body)
+				// 		 (else 		then-body)
+
+				var when:*;
+				var then:*;
+
+				for each (var sexp:* in args)
+				{
+					when = sexp[0];
+					then = sexp[1];
+
+					trace('cond when:', toString(when), 'then:', toString(then));
+
+					if (eval(when, ctx) !== FALSE)
+					{
+						return eval(then, ctx);
+					} 
+				}
+
+				return FALSE;
+			}
+
+			_env[S('else')] = function _else(args:Array, ctx:*):* 
+			{
+				// see (cond)
+
+				return TRUE;
+			}
 			
 			_env[S('atom')] = function _atom(args:*, _:*):*
 			{
@@ -300,41 +334,4 @@ internal function toObject(array:Array):Object
 	return result;
 }
 
-internal function toString(object:Object):String 
-{
-	var out:String;
-
-	if (object is Array) 
-	{
-		out = '[';
-		out += map((object as Array), toString).join(', ');
-		out += ']';
-		return out;
-	}
-
-	if (object is Function)
-	{
-		return 'Function';
-	}
-
-	if (object is Dictionary)
-	{
-		out = '{\n\t';
-		var pairs:Array = [];
-		for (var key:* in object)
-		{
-			var value:* = object[key];
-			if (!(value is Function))
-			{
-				pairs.push(key + ': ' + toString(value));	
-			}
-		}
-
-		out += pairs.join(',\n\t');
-		out += '}';
-		return out;	
-	}
-
-	return String(object);
-}
 
