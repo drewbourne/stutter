@@ -9,14 +9,23 @@ package stutter
 			super();
 		}
 
+		public function load(expression:String):void 
+		{
+			_tokens = expression.match(
+			//	parentheses		numbers				atoms			strings			operators			flags
+				/[()]| 			-?\d+(\.\d+)?|		\w+(-\w+)*|		".*?"|'.*?'|	[\+\-\*\/\<\>=]		/gx);
+		}
+
 		public function read(expression:String):Object 
 		{
-			
-			_tokens = expression.match(
-			//	parentheses		numbers				atoms			strings			operators		flags
-				/[()]| 			-?\d+(\.\d+)?|	\w+(-\w+)*|		".*?"|'.*?'|	[\+\-\*\/\<\>]	/gx);
+			load(expression);
 
 			return parse();
+		}
+
+		public function hasTokens():Boolean
+		{
+			return _tokens.length > 0;
 		}
 
 		public function peek():String 

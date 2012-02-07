@@ -52,5 +52,30 @@ package stutter
 				assertThat(read(example[0]), example[1]);
 			}
 		}
+
+		[Test]
+		public function readFullExpressions():void 
+		{
+			var expressions:String = <![CDATA[
+				1
+				a
+				t
+				()
+				]]>.toString();
+
+			var expression:String;
+
+			reader.load(expressions);
+
+			var results:Array = [];
+			var sexp:*;
+
+			while (reader.hasTokens() && (sexp = reader.parse()))
+			{
+				results.push(sexp);
+			}
+
+			assertThat(results, array(1, S('a'), TRUE, []));
+		}
 	}
 }
