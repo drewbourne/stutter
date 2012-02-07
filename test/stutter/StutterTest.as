@@ -1,6 +1,7 @@
 package stutter 
 {
 	import org.flexunit.assertThat;
+	import org.hamcrest.Matcher;
 	import org.hamcrest.collection.array;
 	import org.hamcrest.collection.emptyArray;
 	import org.hamcrest.object.equalTo;
@@ -17,6 +18,26 @@ package stutter
 		{
 			runtime = new StutterRunTime();
 			reader = new StutterReader();
+		}
+
+		private function eval(expression:String):*
+		{
+			reader.load(expression);
+
+			var sexp:*;
+			var result:*;
+
+			while (reader.hasTokens() && (sexp = reader.parse()))
+			{
+				result = runtime.eval(sexp);
+			}
+
+			return result;
+		}
+
+		private function assert(expression:String, result:*):void 
+		{
+			assertThat(expression, eval(expression), result is Matcher ? result : equalTo(result));
 		}
 
 		[Test]
@@ -74,9 +95,25 @@ package stutter
 			assertThat('false?', eval('(and (eq 2 2) (eq 3 4))'), equalTo(FALSE));
 		}
 
-		private function eval(expression:String):*
+		[Test]
+		public function cond_():void 
 		{
-			return runtime.eval(reader.read(expression));
+			assert('(cond)', FALSE);
+			assert('(cond (t 1))', 1);
+			assert('(cond (nil 1) (t 2))', 2);
+			assert('(cond (else 3))', 3);
+			assert('(cond ((= 1 2) 3) (else 4))', 4);
+
+			eval(<![CDATA[
+
+				(label cond-test (quote (lambda (x)
+					(cond ((= x 1) 1)
+					  	  ((= x 2) 2)
+					  	  ((= x 3) 3)))))
+
+				]]>.toString());
+
+			assert('(cond-test 3)', 3);
 		}
 	}
 }
