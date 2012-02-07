@@ -1,8 +1,10 @@
 package stutter 
 {
 	import org.flexunit.assertThat;
+	import org.hamcrest.Matcher;
 	import org.hamcrest.collection.array;
 	import org.hamcrest.collection.emptyArray;
+	import org.hamcrest.number.closeTo;
 	import org.hamcrest.object.equalTo;
 	import org.hamcrest.object.isFalse;
 	import org.hamcrest.object.isTrue;
@@ -21,12 +23,22 @@ package stutter
 
 		private function eval(expression:String):*
 		{
-			return runtime.eval(reader.read(expression));
+			reader.load(expression);
+
+			var sexp:*;
+			var result:*;
+
+			while (reader.hasTokens() && (sexp = reader.parse()))
+			{
+				result = runtime.eval(sexp);
+			}
+
+			return result;
 		}
 
 		private function assert(expression:String, result:*):void 
 		{
-			assertThat(expression, eval(expression), equalTo(result));
+			assertThat(expression, eval(expression), result is Matcher ? result : equalTo(result));
 		}
 
 		private function ignore(expression:String):void 
@@ -158,8 +170,8 @@ package stutter
 			assert(<![CDATA[
 
 				(if (and (> b a) (< b (* a b)))
-    				b
-    				a)
+					b
+					a)
 				
 				]]>.toString(), eval('b'));
 
@@ -203,7 +215,7 @@ package stutter
 			eval(<![CDATA[
 
 				(label a-plus-abs-b (quote (lambda (a b)
-  					((if (> b 0) (quote +) (quote -)) a b))))
+					((if (> b 0) (quote +) (quote -)) a b))))
 
 				]]>.toString());
 
@@ -211,10 +223,91 @@ package stutter
 			assert('(a-plus-abs-b 1 -2)', 3);
 		}
 
+		// TODO think about this exercise some more. 
+		[Ignore]
 		[Test(order=13)]
 		public function ch1_ex1_5():void 
 		{
+			eval('(label p (quote p)');
 			
+			eval(<![CDATA[
+
+				(label test (quote (lambda (x y) 
+					(if (= x 0)
+						0
+						y))))
+
+				]]>.toString());
+
+			assert('(test 0 (quote p))', eval('p'));
+		}
+
+		[Test(order=14)]
+		public function ch1_1_7_ex1():void 
+		{
+			eval(<![CDATA[
+
+				(label sqrt-iter (quote (lambda (guess x)
+					(if (good-enough guess x)
+						guess
+						(sqrt-iter (improve guess x) x)))))
+
+				(label improve (quote (lambda (guess x)
+					(average guess (/ x guess)))))
+
+				(label average (quote (lambda (x y)
+					(/ (+ x y) 2))))
+
+				(label good-enough (quote (lambda (guess x) 
+					(< (abs (- (square guess) x)) 0.001))))
+
+				(label abs (quote (lambda (x) 
+					(if (< x 0)
+						(- x)
+						x))))
+
+				(label square (quote (lambda (x) (* x x))))
+
+				(label sqrt (quote (lambda (x)
+					(sqrt-iter 1.0 x))))	
+
+				]]>.toString());	
+				
+			assert('(sqrt 9)', closeTo(3, 0.001));
+			assert('(sqrt (+ 100 37))', closeTo(11.704, 0.001));
+			assert('(sqrt (+ (sqrt 2) (sqrt 3)))', closeTo(1.774, 0.001));
+			assert('(square (sqrt 1000))', closeTo(1000, 0.001));
+		}
+
+		// nested label-quote-lambdas does not work as expected.
+		[Ignore] 
+		[Test(order=15)]
+		public function ch1_1_8_ex1():void 
+		{
+			eval(<![CDATA[
+
+				(label square (quote (lambda (x) (* x x))))
+
+				(label average (quote (lambda (x y)
+					(/ (+ x y) 2))))
+
+				(label sqrt (quote (lambda (x) 
+					(label good-enough (quote (lambda (guess)
+						(< (abs (- (square guess) x)) 0.001))))
+					(label improve (quote (lambda (guess)
+						(average guess (/ x guess)))))
+					(label sqrt-iter (quote (lambda (guess)
+						(if (good-enough guess)
+							guess
+							(sqrt-iter (improve guess))))))
+					(sqrt-iter 1.0))))
+				
+				]]>.toString());
+
+			assert('(sqrt 9)', closeTo(3, 0.001));
+			assert('(sqrt (+ 100 37))', closeTo(11.704, 0.001));
+			assert('(sqrt (+ (sqrt 2) (sqrt 3)))', closeTo(1.774, 0.001));
+			assert('(square (sqrt 1000))', closeTo(1000, 0.001));
 		}
 	}
 }
