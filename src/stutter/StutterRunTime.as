@@ -122,12 +122,19 @@ package stutter
 			// math operators
 			_env[S('+')] = function _plus(args:*, _:*):Number 
 			{
+				if (args.length == 1) 
+				{
+					var value:* = args[0];
+					return 	value > 0 ? value : -value;
+				}
+
 				return inject(args.shift(), args, add) as Number;
 			}
 
 			_env[S('-')] = function _minus(args:*, _:*):Number 
 			{
-				if (args.length == 1) {
+				if (args.length == 1) 
+				{
 					return -args[0];
 				}
 
@@ -171,12 +178,8 @@ package stutter
 			{
 				if (ctx[sexp] !== undefined)
 				{
-					// trace('eval    ->atom ctx[sexp]', '\n\t<-result', toString(ctx[sexp]));
-
 					return ctx[sexp];
 				}
-
-				// trace('eval    ->atom sexp', '\n\t<-result', toString(sexp));
 
 				return sexp;
 			}
@@ -190,8 +193,7 @@ package stutter
 
 			var result:* = apply(fn, args, ctx);
 
-			// trace('eval    ->fn', fn, '\targs', toString(args), '\n\t<-result', result);
-			// trace('eval <-', toString(sexp))
+			trace('eval', toString(sexp), 'result:', result);
 
 			return result;
 		}
@@ -200,7 +202,7 @@ package stutter
 		{
 			ctx ||= _env;
 
-			trace('apply', toString(fn), toString(args), ctx == _env ? 'env' : toString(ctx));
+			trace('apply', toString(fn), 'args:', toString(args), 'ctx:', ctx == _env ? 'env' : toString(ctx));
 
 			if (fn is Number)
 			{
@@ -217,6 +219,11 @@ package stutter
 			if (target is Number)
 			{
 				return target;
+			}
+
+			if (!target && fn is Array)
+			{
+				return apply(eval(fn, ctx), args, ctx);
 			}
 
 			if (!target)
@@ -316,7 +323,11 @@ internal function toString(object:Object):String
 		var pairs:Array = [];
 		for (var key:* in object)
 		{
-			pairs.push(key + ': ' + toString(object[key]));
+			var value:* = object[key];
+			if (!(value is Function))
+			{
+				pairs.push(key + ': ' + toString(value));	
+			}
 		}
 
 		out += pairs.join(',\n\t');

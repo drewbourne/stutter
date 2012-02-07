@@ -112,6 +112,7 @@ package stutter
 		[Test]
 		public function math():void 
 		{
+			assertThat('+', l.eval([ S('+'), -2 ]), equalTo(2));
 			assertThat('+', l.eval([ S('+'), 2, 3 ]), equalTo(5));
 			assertThat('-', l.eval([ S('-'), 2, 3 ]), equalTo(-1));
 			assertThat('-', l.eval([ S('-'), 2 ]), equalTo(-2));
