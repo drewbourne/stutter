@@ -196,5 +196,25 @@ package stutter
 			assert('(sum-largest-two 3 4 2)', 25);
 			assert('(sum-largest-two 4 2 3)', 25);
 		}
+
+		[Test(order=12)]
+		public function ch1_ex1_4():void 
+		{
+			eval(<![CDATA[
+
+				(label a-plus-abs-b (quote (lambda (a b)
+  					((if (> b 0) (quote +) (quote -)) a b))))
+
+				]]>.toString());
+
+			assert('(a-plus-abs-b 1 2)', 3);
+			assert('(a-plus-abs-b 1 -2)', 3);
+		}
+
+		[Test(order=13)]
+		public function ch1_ex1_5():void 
+		{
+			
+		}
 	}
 }
